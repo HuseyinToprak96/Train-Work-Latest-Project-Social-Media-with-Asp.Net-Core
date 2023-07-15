@@ -1,0 +1,46 @@
+﻿@using SocialMedia.Web.Areas.Manager.Models.Dtos;
+@using SocialMedia.Web.Models.Enums;
+@model List<SharedDto>
+@{
+    ViewData["Title"] = "Gönderi Listesi";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <td>Gönderi</td>
+            <td>Başlık</td>
+            <td>Açıklama</td>
+            <th>Kaldır</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var shared in Model){
+            <tr>
+                <td>
+                    @if (shared.Type==EFileType.Image)
+                    {
+                        <img src="/@shared.Path" width="100" height="100"/>
+                    }
+                    else if (shared.Type == EFileType.Text)
+                    {
+                        <p>@shared.Description</p>
+                    }
+                    else if(shared.Type==EFileType.Video)
+                    {
+                        <video width="360" height="320" controls="controls">
+                            <source src="~/Content/videos/@shared.Path" type="video/mp4" />
+                        </video>
+                    }
+                </td>
+                <td>@shared.Title</td>
+                <td>@shared.Description</td>
+                <td>
+                    <a href="/Manager/Shared/Delete?id=@shared.Id" class="btn btn-danger">X</a>
+                </td>
+            </tr>
+        }
+</tbody>
+</table>
+

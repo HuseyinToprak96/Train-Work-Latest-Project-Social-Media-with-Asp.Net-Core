@@ -1,0 +1,180 @@
+﻿@using SocialMedia.Web.Models.Dtos;
+@using SocialMedia.Web.Models.Enums;
+@model ProfileDto
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutDefault.cshtml";
+}
+<div class="row">
+    <div class="col-4">
+
+    <div class="card w-100">
+        <div class="card-header">Kişisel Bilgiler</div>
+        <div class="card-body">
+            <form asp-action="Update" method="post">
+                <input type="hidden" value="@Model.User.Id" name="Id"/>
+            <table class="table table-bordered table-hover">
+                <tr>
+                    <th>Adı</th>
+                    <td><input type="text" value="@Model.User.Name" name="Name" class="form-control"/></td>
+                </tr>
+                <tr>
+                    <th>Soyadı</th>
+                            <td><input type="text" value="@Model.User.Surname" name="Surname" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                            <td><input type="text" value="@Model.User.Email" name="Email" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <th>Kullanıcı Adı</th>
+                            <td><input type="text" value="@Model.User.UserName" name="UserName" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <th>Telefon</th>
+                            <td><input type="text" value="@Model.User.PhoneNumber" name="PhoneNumber" class="form-control" /></td>
+                </tr>
+                </table>
+                <input type="submit" class="btn btn-light" value="Güncelle"/>
+            </form>
+
+        </div>
+    </div>
+        <div class="container w-100 mt-3">
+            <br>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#home">Takipçiler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#menu1">Takip Edilenler</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="home" class="container tab-pane active">
+                    <br>
+                  <ul>
+                        @foreach(var user in Model.Followers)
+                        {
+                            <li>@user.Username  <a href="/Follow/Remove?userId=@user.Id&& transaction=1" class="btn btn-danger">Takipten Çıkar</a></li>
+                        }
+                    </ul>
+                </div>
+                <div id="menu1" class="container tab-pane fade">
+                    <br>
+                    @if (Model.Followings.Count>0)
+                    {
+                    <ul>
+                        @foreach (var user in Model.Followings)
+                        {
+                            <li>@user.Username <a href="/Follow/Remove?userId=@user.Id&transaction=2" class="btn btn-danger">Takipten Çık</a> </li>
+                        }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning"><a href="/User/Search">Yeni Kişiler Bul</a></div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-8">
+    @foreach (var shared in Model.SharedDtos)
+    {
+        <div class="card w-100 mt-3">
+            <div class="card-header">@shared.Title</div>
+            <div class="card-body">
+                @if (shared.Type == EFileType.Image)             
+                {
+                    <img src="/@shared.Path" width="100%" height="250" />
+                }
+                else if (shared.Type == EFileType.Text)
+                {
+                    <p>@shared.Description</p>
+                }
+                else if (shared.Type == EFileType.Video)
+                {
+                    <video width="100%" height="250" controls="controls">
+                        <source src="~/Content/videos/@shared.Path" type="video/mp4" />
+                    </video>
+                }
+            </div>
+            <div class="card-footer">
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                           @shared.LikeUsers.Count kişi tarafından beğenildi.
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach(var user in shared.LikeUsers){
+                            <li><a class="dropdown-item" href="">@user</a></li>}
+                        </ul>
+                    </div>
+                    <div class="accordion accordion-flush" id="accordionFlushExample_@shared.Id">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#yorumlar_@shared.Id" aria-expanded="false" aria-controls="flush-collapseOne">
+                                    Yorumlar
+                                </button>
+                            </h2>
+                            <div id="yorumlar_@shared.Id" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample_@shared.Id">
+                                @foreach (var item in shared.Comments.Where(x => x.TopCommentId == 0).ToList())
+                                {
+                                    <div class="accordion accordion-flush" id="accordionFlushExample_@item.Id">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#comment_@item.Id" aria-expanded="false" aria-controls="flush-collapseOne">
+                                                    <strong>@item.Username</strong>  | <span>@item.Comment</span>                       <strong style="margin-left:50%">@item.CreatedDate.ToShortDateString()</strong><strong>
+                                                            <a href="/Comment/Delete?id=@item.Id">X</a>
+                                                    </strong>
+                                                </button>
+                                            </h2>
+                                            <div id="comment_@item.Id" class="accordion-collapse collapse mt-lg-3" data-bs-parent="#accordionFlushExample_@item.Id">
+                                                @foreach (var subComment in shared.Comments.Where(x => x.TopCommentId == item.Id).ToList())
+                                                {
+                                                    <div>
+                                                        <strong>@subComment.Username</strong>  | <span>@subComment.Comment</span>                       <strong style="margin-left:60%">@subComment.CreatedDate.ToShortDateString()</strong>
+                                                            <a href="/Comment/Delete?id=@subComment.Id">X</a>
+                                                    </div>
+                                                }
+                                                <hr />
+                                                <form asp-action="Add" asp-controller="Comment" method="post">
+                                                    <input type="hidden" name="TopCommentId" value="@item.Id" />
+                                                    <input type="hidden" name="SharedId" value="@shared.Id">
+                                                    <label for="Comment">Cevap</label>
+                                                    <textarea class="form-control" name="Comment" id="Comment">
+
+                                                                </textarea>
+                                                    <br />
+                                                    <input type="submit" value="Ekle" class="btn btn-primary" />
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                }
+                                <hr />
+                                <form asp-action="Add" asp-controller="Comment" method="post">
+                                    <input type="hidden" name="TopCommentId" value="0" />
+                                    <input type="hidden" name="SharedId" value="@shared.Id">
+                                    <label for="Comment">Yorum</label>
+                                    <textarea class="form-control" name="Comment">
+
+                                                                </textarea>
+                                    <br />
+                                    <input type="submit" value="Ekle" class="btn btn-primary" />
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+            </div>
+        </div>
+
+    }
+    </div>
+</div>

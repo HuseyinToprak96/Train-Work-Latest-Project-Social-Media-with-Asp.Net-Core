@@ -1,0 +1,44 @@
+﻿@using SocialMedia.Web.Helpers;
+@using SocialMedia.Web.Models.Dtos;
+@model PagesDto<UserAppDto>
+
+@{
+    ViewData["Title"] = "Search";
+    Layout = "~/Views/Shared/_LayoutDefault.cshtml";
+}
+<div class="row">
+    <div class="col-8 offset-2">
+        <div class="card">
+            <div class="card-header">
+                <form asp-action="Search" asp-controller="User" method="get">
+                    <input type="text" class="form-control" placeholder="Kullanıcı Adı Giriniz" name="search" />
+                    <br/>
+                    <input type="submit" class="btn btn-primary" value="Ara" />
+                </form>
+            </div>
+            <div class="card-body">
+                <table>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td>@item.Username</td>
+                            <td><a href="/Follow/Add?userId=@item.Id" class="btn btn-light">Takip Et</a></td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="card-footer">
+                <ul>
+                    @for (int i = 1; i <= Model.PageCount; i++)
+                    {
+                        <li style="background-color:red;height:25px;width:25px;list-style-type:none;float:left"><a href="/Home/Index?page=@i" style="color:white;text-align:center;text-decoration:none;padding-left:10px">@i</a></li>
+                    }
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+

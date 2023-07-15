@@ -1,0 +1,46 @@
+﻿@using SocialMedia.Web.Models.Dtos;
+@using SocialMedia.Web.Areas.Manager.Models.Dtos;
+@model Tuple<IEnumerable<SharedDto>,IEnumerable<UserAppDto>>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div class="accordion accordion-flush" id="accordionFlushExample">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                @Model.Item1.Count() yeni gönderi eklendi!
+            </button>
+        </h2>
+        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+            <div class="accordion-body">
+                <ul>
+                    @foreach (var item in Model.Item1)
+                    {
+                        <li>@item.Title başlığı ile 1 adet @item.Type eklendi.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                @Model.Item2.Count() yeni kullanıcı eklendi!
+            </button>
+        </h2>
+        <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+            <div class="accordion-body">
+                <ul>
+                    @foreach (var item in Model.Item2)
+                    {
+                        <li>@item.Username</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
